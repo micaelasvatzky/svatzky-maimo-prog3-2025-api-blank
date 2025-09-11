@@ -4,7 +4,7 @@ import Product from "../models/products.js";
 
 const findAllProducts = async (req, res) => {
   try {
-    const products = await Product.find().select("_id name");
+    const products = await Product.find().select("_id name categories");
     return res
       .status(200)
       .send({ message: "Todos los products", products: products });
@@ -16,7 +16,7 @@ const findAllProducts = async (req, res) => {
 const findOneProduct = async (req, res) => {
   const { id } = req.params;
   try {
-    const product = await Product.findOne({ _id: id }).select("_id name");
+    const product = await Product.findOne({ _id: id }).select("_id name categories");
     return res.status(200).send({ message: "Producto encontrado", product });
   } catch (error) {
     return res.status(501).send({ message: "Hubo un error", error });
@@ -24,9 +24,27 @@ const findOneProduct = async (req, res) => {
 };
 
 const addProduct = async (req, res) => {
-  const { name } = req.body;
+  const {
+    name,
+    categories,
+    description,
+    format,
+    price,
+    tags,
+    fileUrl,
+    imageUrl,
+  } = req.body;
   try {
-    const product = new Product({ name });
+    const product = new Product({
+      name,
+      categories,
+      description,
+      format,
+      price,
+      tags,
+      fileUrl,
+      imageUrl,
+    });
     await product.save();
     return res.status(200).send({ message: "Producto creado", product });
   } catch (error) {
@@ -52,7 +70,7 @@ const deleteProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   const { id } = req.params;
-  const { name } = req.body;
+  const { name, categories, description, format, price, tags, fileUrl, imageUrl  } = req.body;
 
   try {
     const productToUpdate = await Product.findOne({ _id: id });
@@ -64,8 +82,16 @@ const updateProduct = async (req, res) => {
 
     //Valores a actualizar
     productToUpdate.name = name;
+    productToUpdate.categories = categories;
+    productToUpdate.description = description;
+    productToUpdate.format = format;
+    productToUpdate.price = price;
+    productToUpdate.tags = tags;
+    productToUpdate.fileUrl = fileUrl;
+    productToUpdate.imageUrl = imageUrl;
 
-    await productToUpdate.save()
+
+    await productToUpdate.save();
     return res
       .status(200)
       .send({ message: "Producto actualizado", product: productToUpdate });
@@ -79,6 +105,6 @@ router.get("/", findAllProducts);
 router.get("/:id", findOneProduct);
 router.post("/", addProduct);
 router.delete("/:id", deleteProduct);
-router.put("/:id", updateProduct)
+router.put("/:id", updateProduct);
 
 export default router;
