@@ -1,6 +1,7 @@
 import express from "express";
 const router = express.Router();
 import Product from "../models/products.js";
+import mongoose from "mongoose";
 
 const findAllProducts = async (req, res) => {
   try {
@@ -16,7 +17,9 @@ const findAllProducts = async (req, res) => {
 const findOneProduct = async (req, res) => {
   const { id } = req.params;
   try {
-    const product = await Product.findOne({ _id: id }).select("_id name categories");
+    const product = await Product.findOne({ _id: id }).select(
+      "_id name categories"
+    );
     return res.status(200).send({ message: "Producto encontrado", product });
   } catch (error) {
     return res.status(501).send({ message: "Hubo un error", error });
@@ -70,7 +73,16 @@ const deleteProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   const { id } = req.params;
-  const { name, categories, description, format, price, tags, fileUrl, imageUrl  } = req.body;
+  const {
+    name,
+    categories,
+    description,
+    format,
+    price,
+    tags,
+    fileUrl,
+    imageUrl,
+  } = req.body;
 
   try {
     const productToUpdate = await Product.findOne({ _id: id });
@@ -89,7 +101,6 @@ const updateProduct = async (req, res) => {
     productToUpdate.tags = tags;
     productToUpdate.fileUrl = fileUrl;
     productToUpdate.imageUrl = imageUrl;
-
 
     await productToUpdate.save();
     return res
